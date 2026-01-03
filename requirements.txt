@@ -1,0 +1,27 @@
+# Core dependencies
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+pydantic>=2.10.0
+pydantic-settings>=2.7.0
+
+# RSS/Feed parsing
+feedparser==6.0.11
+
+# HTTP requests
+httpx==0.26.0
+aiohttp==3.9.1
+
+# Google Gemini API
+google-generativeai>=0.8.0
+
+# Scheduling
+apscheduler==3.10.4
+
+# Data handling
+python-dateutil==2.8.2
+
+# Storage
+tinydb==4.8.0
+
+# Protocol buffers (Python 3.14 compatibility)
+protobuf>=5.28.0,<6.0.0

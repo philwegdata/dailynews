@@ -1,0 +1,239 @@
+Website that pulls every morning the most relevant news for me from a list of trusted sources, aggregates it and presents in a nice way.
+The sources are hacker news, selected youtube channels, spotify podcasts, hugging face daily papers and substack newsletters.
+I am most interested in general AI news but specifically in industrial AI.
+The output should be a minimal modern looking website that is structured in 3x5 tiles, showing the 15 most important news of the day.
+Every tile has a headline, the name of the publication and a short summary. A click on the tile opens the source link.
+The website updates every morning at 6 am CET and all previous days are readily available in tabs at the top of the website (today, yesterday, 01 Jan 2026, 31 Dec 2025 .. and so on but only if already rendered)
+
+# Your AI News Aggregator - Sources Configuration
+# Updated with your specific sources
+
+sources:
+  # ===================
+  # YOUTUBE (via RSS - no API key needed!)
+  # ===================
+
+  - name: "Super Data Science"
+    type: youtube_rss
+    url: "https://youtube.com/playlist?list=PLS3615GtilzBoe1fmujEOh8PsKUdnFZco"
+    rss: "https://www.youtube.com/feeds/videos.xml?playlist_id=PLS3615GtilzBoe1fmujEOh8PsKUdnFZco"
+    language: en
+    frequency: "twice weekly"
+    focus: "ML, AI careers, data science, interviews"
+    # YouTube provides free RSS feeds for playlists!
+    # Format: https://www.youtube.com/feeds/videos.xml?playlist_id={PLAYLIST_ID}
+    # Also works for channels: ?channel_id={CHANNEL_ID}
+
+  # ===================
+  # PODCASTS (via RSS)
+  # ===================
+
+  - name: "IoT Use Case Podcast"
+    type: podcast
+    url: "https://iotusecase.com/de/"
+    rss: "https://feeds.buzzsprout.com/947515.rss"
+    language: de
+    frequency: "weekly"
+    focus: "Industrial IoT, German manufacturing, IIoT projects"
+
+  - name: "Doppelgänger Tech Talk"
+    type: podcast
+    url: "https://www.doppelgaenger.io/"
+    rss: "https://doppelgaenger.podigee.io/feed/mp3"
+    language: de
+    frequency: "twice weekly"
+    focus: "Tech news, startups, GAFAM, German tech scene"
+
+  - name: "Industrial AI Podcast"
+    type: podcast
+    url: "https://aipod.de/allepisodes/"
+    rss: "https://kipodcast.podigee.io/feed/mp3"
+    language: en/de
+    frequency: "weekly"
+    focus: "Industrial AI, manufacturing ML, automation"
+
+  - name: "Manufacturing Happy Hour"
+    type: podcast
+    url: "https://manufacturinghappyhour.com/podcast/"
+    rss: "https://feeds.captivate.fm/manufacturing-happy-hour/"
+    language: en
+    frequency: "weekly"
+    focus: "Manufacturing trends, automation, AI in manufacturing, leadership"
+
+  # ===================
+  # NEWSLETTERS (via RSS/Substack)
+  # ===================
+
+  - name: "Exponential Industry"
+    type: newsletter
+    url: "https://substack.exponentialindustry.com/"
+    rss: "https://exponentialindustry.substack.com/feed"
+    language: en
+    frequency: "weekly"
+    focus: "Industrial technology, exponential trends"
+
+  - name: "The Sequence"
+    type: newsletter
+    url: "https://thesequence.substack.com/"
+    rss: "https://thesequence.substack.com/feed"
+    language: en
+    frequency: "multiple per week"
+    focus: "ML/AI technical deep dives, research"
+
+  - name: "Where's Your Ed At"
+    type: newsletter
+    url: "https://www.wheresyoured.at/"
+    rss: "https://www.wheresyoured.at/rss/"
+    language: en
+    frequency: "weekly"
+    focus: "Tech criticism, AI skepticism, industry analysis"
+
+  # ===================
+  # NEWS AGGREGATORS (via API - no key needed!)
+  # ===================
+
+  - name: "Hacker News"
+    type: api
+    url: "https://news.ycombinator.com/front"
+    api_endpoint: "https://hacker-news.firebaseio.com/v0/"
+    language: en
+    frequency: "continuous"
+    focus: "Tech news, startups, programming, AI"
+    # Free public API, no authentication required
+    # Endpoints:
+    #   - /v0/topstories.json → list of top 500 story IDs
+    #   - /v0/item/{id}.json → story details (title, url, score, etc.)
+
+  # ===================
+  # RESEARCH / PAPERS
+  # ===================
+
+  - name: "Hugging Face Daily Papers"
+    type: api
+    url: "https://huggingface.co/papers"
+    api_endpoint: "https://huggingface.co/api/daily_papers"
+    language: en
+    frequency: "daily"
+    focus: "ML/AI research papers, trending on HF"
+
+# ===================
+# FETCHER NOTES
+# ===================
+#
+# ALL SOURCES ARE API-KEY-FREE! 🎉
+#
+# For YouTube playlists/channels: Use free RSS feeds
+#   - Playlist: https://www.youtube.com/feeds/videos.xml?playlist_id={PLAYLIST_ID}
+#   - Channel: https://www.youtube.com/feeds/videos.xml?channel_id={CHANNEL_ID}
+#   - Parse with feedparser like any other RSS feed
+#
+# For podcasts: Use feedparser to parse RSS feeds
+# For Substack: RSS feeds follow pattern: https://{name}.substack.com/feed
+#
+# For Hacker News: Free public Firebase API
+#   - GET https://hacker-news.firebaseio.com/v0/topstories.json → top 500 IDs
+#   - GET https://hacker-news.firebaseio.com/v0/item/{id}.json → story details
+#   - Filter by score and recency, then fetch full details
+#   - No authentication required!
+#
+# For Hugging Face: Public API endpoint, no key needed
+#   - GET https://huggingface.co/api/daily_papers
+#   - Returns JSON array with paper metadata
+#
+# All sources support looking back 24-72 hours for content
+
+# ===================
+# LLM CONFIGURATION (for summaries)
+# ===================
+
+llm:
+  provider: "google"
+  model: "gemini-1.5-flash"  # Fast and cheap, good for summaries
+  # Alternative: "gemini-1.5-pro" for higher quality
+
+  # Get free API key at: https://aistudio.google.com/apikey
+  # Free tier: 15 RPM, 1M tokens/day - more than enough!
+  # Set as environment variable: GOOGLE_API_KEY
+
+  summary_prompt: |
+    Summarize this article in exactly 2 sentences (max 50 words total).
+    Focus on: what happened, why it matters, and any industrial AI implications.
+    Be factual and specific. No fluff.
+
+    Title: {title}
+    Source: {source}
+    Content: {description}
+
+    Summary:
+
+# ===================
+# RELEVANCE KEYWORDS
+# ===================
+
+keywords:
+  high_priority:  # Score: 3x
+    - "industrial AI"
+    - "manufacturing AI"
+    - "factory automation"
+    - "predictive maintenance"
+    - "quality control"
+    - "computer vision industrial"
+    - "edge AI"
+    - "IIoT"
+    - "Industry 4.0"
+    - "Industrie 4.0"
+    - "OT security"
+    - "digital twin"
+    - "digitaler Zwilling"
+    - "Maschinenbau"
+    - "Fertigung"
+    - "Automatisierung"
+
+  medium_priority:  # Score: 2x
+    - "LLM"
+    - "large language model"
+    - "transformer"
+    - "machine learning"
+    - "deep learning"
+    - "MLOps"
+    - "foundation model"
+    - "AI deployment"
+    - "inference"
+    - "robotics"
+    - "autonomous"
+
+  general:  # Score: 1x
+    - "artificial intelligence"
+    - "AI"
+    - "ML"
+    - "neural network"
+    - "OpenAI"
+    - "Anthropic"
+    - "Claude"
+    - "GPT"
+    - "Nvidia"
+    - "Siemens"
+
+# ===================
+# DISPLAY SETTINGS
+# ===================
+
+display:
+  articles_per_day: 15
+  grid_columns: 5
+  grid_rows: 3
+  update_time: "06:00"
+  timezone: "Europe/Berlin"  # CET
+
+  # Source colors for visual distinction
+  source_colors:
+    "Industrial AI Podcast": "#3B82F6"      # blue
+    "IoT Use Case Podcast": "#F97316"       # orange
+    "Hugging Face Papers": "#EAB308"        # yellow
+    "Doppelgänger": "#8B5CF6"              # purple
+    "Super Data Science": "#EF4444"         # red (YouTube)
+    "Exponential Industry": "#06B6D4"       # cyan
+    "The Sequence": "#6366F1"               # indigo
+    "Hacker News": "#FF6600"                # HN orange
+    "Where's Your Ed At": "#F43F5E"         # rose
+    "Manufacturing Happy Hour": "#F59E0B"   # amber

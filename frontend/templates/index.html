@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI News Aggregator</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI News Aggregator</h1>
+            <p class="subtitle">Your daily dose of AI and industrial technology news</p>
+        </header>
+
+        <nav class="date-tabs" id="dateTabs">
+            <!-- Date tabs will be populated by JavaScript -->
+        </nav>
+
+        <main class="news-grid" id="newsGrid">
+            <!-- News tiles will be populated by JavaScript -->
+        </main>
+
+        <div class="loading" id="loading">
+            <p>Loading news...</p>
+        </div>
+
+        <div class="error" id="error" style="display: none;">
+            <p>Error loading news. Please try again later.</p>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
