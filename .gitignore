@@ -34,8 +34,6 @@ wheels/
 *.swo
 *~
 
-# Data
-data/*.json
 
 # Cache
 cache/
