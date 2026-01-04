@@ -25,13 +25,22 @@ jobs:
     - name: Install dependencies
       run: |
         pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install -r requirements-ci.txt
 
     - name: Run aggregation
       env:
         GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
       run: |
         python -m backend.aggregator
+
+    - name: Check generated data
+      run: |
+        echo "Generated files:"
+        ls -lh data/*.json || echo "No JSON files generated"
+        if [ -f "data/$(date +'%Y-%m-%d').json" ]; then
+          echo "Today's file content preview:"
+          head -50 "data/$(date +'%Y-%m-%d').json"
+        fi
 
     - name: Commit and push changes
       run: |

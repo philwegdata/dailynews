@@ -4,10 +4,11 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'data/*.json'
-      - 'frontend/**'
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Daily News Aggregation"]
+    types:
+      - completed
 
 permissions:
   contents: read
