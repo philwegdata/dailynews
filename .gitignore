@@ -34,6 +34,10 @@ wheels/
 *.swo
 *~
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> bc381883b4dd78011b1897e57cc22aabd1c86bb3
 # Cache
 cache/
 *.cache
