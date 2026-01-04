@@ -6,6 +6,9 @@ on:
     - cron: '0 4 * * *'  # 4 AM UTC = 6 AM CEST (summer)
   workflow_dispatch:  # Allow manual trigger
 
+permissions:
+  contents: write  # Allow pushing commits
+
 jobs:
   aggregate:
     runs-on: ubuntu-latest
