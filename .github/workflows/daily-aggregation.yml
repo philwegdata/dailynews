@@ -2,8 +2,9 @@ name: Daily News Aggregation
 
 on:
   schedule:
-    # Run every day at 6:00 AM CET (5:00 AM UTC in winter, 4:00 AM UTC in summer)
-    - cron: '0 4 * * *'  # 4 AM UTC = 6 AM CEST (summer)
+    # Run at 5 AM UTC = 6 AM CET (winter) / 7 AM CEST (summer)
+    # GitHub Actions doesn't support DST-aware scheduling, so we optimize for CET
+    - cron: '0 5 * * *'
   workflow_dispatch:  # Allow manual trigger
 
 permissions:
@@ -47,4 +48,24 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add data/*.json
-        git diff --quiet && git diff --staged --quiet || (git commit -m "Update news for $(date +'%Y-%m-%d')" && git push)
+
+        # Check if there are changes to commit
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+          exit 0
+        fi
+
+        git commit -m "Update news for $(date +'%Y-%m-%d')"
+
+        # Push with retry logic for network resilience
+        for i in 1 2 3 4; do
+          if git push; then
+            echo "Push successful"
+            exit 0
+          fi
+          echo "Push attempt $i failed, retrying in $((2**i)) seconds..."
+          sleep $((2**i))
+        done
+
+        echo "All push attempts failed"
+        exit 1
